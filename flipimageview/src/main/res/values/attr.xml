@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FlipImageView">
+        <attr name="flipBgColor" format="color"/>
+        <attr name="flipCheckColor" format="color"/>
+        <attr name="flipCheckDrawable" format="reference"/>
+        <attr name="flipScale" format="float"/>
+        <attr name="flipDuration" format="integer"/>
+        <attr name="flipDirection" format="enum">
+            <enum name="LR" value="1"/>
+            <enum name="UD" value="2"/>]
+        </attr>
+    </declare-styleable>
+</resources>
