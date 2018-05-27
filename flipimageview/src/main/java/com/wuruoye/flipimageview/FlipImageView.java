@@ -7,31 +7,35 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.content.res.AppCompatResources;
 import android.util.AttributeSet;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
+import android.widget.ImageView;
 
 /**
  * @Created : wuruoye
  * @Date : 2018/5/26 21:28.
  * @Description : 可翻转 ImageView
  */
-public class FlipImageView extends android.support.v7.widget.AppCompatImageView
+public class FlipImageView extends ImageView
         implements ValueAnimator.AnimatorUpdateListener {
+    public static final String TAG = "FlipImageView";
     public static final int MAX_ALPHA = 255;
     public static final int DEFAULT_DURATION = 300;
     public static final float DEFAULT_SCALE = 0.6F;
     public static final int DEFAULT_DRAWABLE = R.drawable.ic_check;
+    public static final int DEFAULT_BG_COLOR = Color.BLACK;
+    public static final int DEFAULT_CHECK_COLOR = Color.WHITE;
     public static final Interpolator DEFAULT_INTERPOLATOR = new AccelerateDecelerateInterpolator();
     public static final float START = 0F;
+    public static final float MIDDLE_1 = 0.5F;
+    public static final float MIDDLE_2 = 1F;
     public static final float END = 1.5F;
     public static final int LR = 1;
     public static final int UD = 2;
@@ -52,6 +56,7 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
 
     private ValueAnimator mAnimator;
     private float mProgress;
+    private float mLastProgress = -1;
     private OnFlipListener mOnFlipListener;
 
     public FlipImageView(Context context) {
@@ -60,13 +65,13 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
         init();
     }
 
-    public FlipImageView(Context context, @Nullable AttributeSet attrs) {
+    public FlipImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         loadAttr(context, attrs);
         init();
     }
 
-    public FlipImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public FlipImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         loadAttr(context, attrs);
         init();
@@ -75,10 +80,8 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
     private void loadAttr(Context context, AttributeSet attrs) {
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.FlipImageView);
 
-        colorBg = ta.getColor(R.styleable.FlipImageView_flipBgColor,
-                FlipUtil.getPrimaryColor(context));
-        colorCheck = ta.getColor(R.styleable.FlipImageView_flipCheckColor,
-                FlipUtil.getAccentColor(context));
+        colorBg = ta.getColor(R.styleable.FlipImageView_flipBgColor, DEFAULT_BG_COLOR);
+        colorCheck = ta.getColor(R.styleable.FlipImageView_flipCheckColor, DEFAULT_CHECK_COLOR);
         resourceCheck = ta.getResourceId(R.styleable.FlipImageView_flipCheckDrawable,
                 DEFAULT_DRAWABLE);
         mScale = ta.getFloat(R.styleable.FlipImageView_flipScale, DEFAULT_SCALE);
@@ -89,8 +92,8 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
     }
 
     private void loadDefaultAttr(Context context) {
-        colorBg = FlipUtil.getPrimaryColor(context);
-        colorCheck = FlipUtil.getAccentColor(context);
+        colorBg = DEFAULT_BG_COLOR;
+        colorCheck = DEFAULT_CHECK_COLOR;
         resourceCheck = DEFAULT_DRAWABLE;
         mScale = DEFAULT_SCALE;
         mDuration = DEFAULT_DURATION;
@@ -127,7 +130,7 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
         mBgPaint.setStyle(Paint.Style.FILL);
         mBgPaint.setColor(colorBg);
 
-        setCheckImage(resourceCheck);
+        setCheckDrawable(getResources().getDrawable(resourceCheck));
         initDrawable();
     }
 
@@ -156,30 +159,25 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
 
     public void setCheckColor(int color) {
         colorCheck = color;
-        DrawableCompat.setTint(mCheckDrawable, color);
+        FlipUtil.tintDrawable(mCheckDrawable, color);
     }
 
     public void setCheckDrawable(Drawable drawable) {
         mCheckDrawable = drawable;
-        DrawableCompat.setTint(mCheckDrawable, colorCheck);
+        if (mCheckDrawable != null) {
+            FlipUtil.tintDrawable(mCheckDrawable, colorCheck);
+        }
     }
 
     public void setCheckDrawable(int resourceId) {
-        setCheckDrawable(AppCompatResources.getDrawable(getContext(), resourceId));
+        setCheckDrawable(getResources().getDrawable(resourceId));
     }
 
     public void setCheckDrawable(Bitmap bitmap) {
         setCheckDrawable(new BitmapDrawable(getResources(), bitmap));
     }
 
-    private void setCheckImage(int resource) {
-        mCheckDrawable = AppCompatResources.getDrawable(getContext(), resource);
-        if (mCheckDrawable != null) {
-            DrawableCompat.setTint(mCheckDrawable, colorCheck);
-        }
-    }
-
-    private void setOnFlipListener(OnFlipListener listener) {
+    public void setOnFlipListener(OnFlipListener listener) {
         mOnFlipListener = listener;
     }
 
@@ -227,9 +225,26 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
         return (int) (progress * MAX_ALPHA);
     }
 
+    private void beforeProgress(float lastProgress, float progress) {
+        if (mOnFlipListener != null) {
+//            Log.e(TAG, "beforeProgress: " + lastProgress + " " + progress );
+            if (lastProgress < MIDDLE_1 && progress >= MIDDLE_1) {
+                mOnFlipListener.onSecondStart();
+            }else if (lastProgress < MIDDLE_2 && progress >= MIDDLE_2) {
+                mOnFlipListener.onThirdStart();
+            }else if (lastProgress > MIDDLE_2 && progress <= MIDDLE_2) {
+                mOnFlipListener.onSecondStart();
+            }else if (lastProgress > MIDDLE_1 && progress <= MIDDLE_1) {
+                mOnFlipListener.onThirdStart();
+            }
+            mLastProgress = progress;
+        }
+    }
+
     @Override
     public void onAnimationUpdate(ValueAnimator valueAnimator) {
         mProgress = (float) valueAnimator.getAnimatedValue();
+//        Log.e(TAG, "onAnimationUpdate: " + mProgress);
         postInvalidate();
     }
 
@@ -239,6 +254,7 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
 
         float progress = mProgress;
 
+        beforeProgress(mLastProgress, progress);
         canvas.save();
         int center = canvas.getWidth() / 2;
 

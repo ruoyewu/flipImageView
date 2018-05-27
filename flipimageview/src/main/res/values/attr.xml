@@ -8,7 +8,7 @@
         <attr name="flipDuration" format="integer"/>
         <attr name="flipDirection" format="enum">
             <enum name="LR" value="1"/>
-            <enum name="UD" value="2"/>]
+            <enum name="UD" value="2"/>
         </attr>
     </declare-styleable>
 </resources>

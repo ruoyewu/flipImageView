@@ -8,9 +8,7 @@
     <com.wuruoye.flipimageview.FlipImageView
         android:id="@+id/fiv"
         app:flipDirection="LR"
-        app:flipDuration="300"
-        app:flipBgColor="@color/colorPrimary"
-        app:flipCheckColor="@color/colorAccent"
+        app:flipDuration="3000"
         app:flipScale="0.5"
         app:flipCheckDrawable="@drawable/ic_check"
         android:src="@drawable/ic_free_breakfast"
