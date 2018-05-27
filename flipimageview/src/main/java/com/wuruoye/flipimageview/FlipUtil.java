@@ -1,7 +1,9 @@
 package com.wuruoye.flipimageview;
 
-import android.graphics.PorterDuff;
+import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.util.TypedValue;
 
 /**
  * @Created : wuruoye
@@ -10,6 +12,18 @@ import android.graphics.drawable.Drawable;
  */
 public class FlipUtil {
     public static void tintDrawable(Drawable drawable, int color) {
-        drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        DrawableCompat.setTint(drawable, color);
+    }
+
+    public static int getPrimaryColor(Context context) {
+        TypedValue value = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.colorPrimary, value, true);
+        return value.data;
+    }
+
+    public static int getAccentColor(Context context) {
+        TypedValue value = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.colorAccent, value, true);
+        return value.data;
     }
 }

@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -30,8 +29,6 @@ public class FlipImageView extends ImageView
     public static final int DEFAULT_DURATION = 300;
     public static final float DEFAULT_SCALE = 0.6F;
     public static final int DEFAULT_DRAWABLE = R.drawable.ic_check;
-    public static final int DEFAULT_BG_COLOR = Color.BLACK;
-    public static final int DEFAULT_CHECK_COLOR = Color.WHITE;
     public static final Interpolator DEFAULT_INTERPOLATOR = new AccelerateDecelerateInterpolator();
     public static final float START = 0F;
     public static final float MIDDLE_1 = 0.5F;
@@ -80,8 +77,10 @@ public class FlipImageView extends ImageView
     private void loadAttr(Context context, AttributeSet attrs) {
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.FlipImageView);
 
-        colorBg = ta.getColor(R.styleable.FlipImageView_flipBgColor, DEFAULT_BG_COLOR);
-        colorCheck = ta.getColor(R.styleable.FlipImageView_flipCheckColor, DEFAULT_CHECK_COLOR);
+        colorBg = ta.getColor(R.styleable.FlipImageView_flipBgColor,
+                FlipUtil.getPrimaryColor(context));
+        colorCheck = ta.getColor(R.styleable.FlipImageView_flipCheckColor,
+                FlipUtil.getAccentColor(context));
         resourceCheck = ta.getResourceId(R.styleable.FlipImageView_flipCheckDrawable,
                 DEFAULT_DRAWABLE);
         mScale = ta.getFloat(R.styleable.FlipImageView_flipScale, DEFAULT_SCALE);
@@ -92,8 +91,8 @@ public class FlipImageView extends ImageView
     }
 
     private void loadDefaultAttr(Context context) {
-        colorBg = DEFAULT_BG_COLOR;
-        colorCheck = DEFAULT_CHECK_COLOR;
+        colorBg = FlipUtil.getPrimaryColor(context);
+        colorCheck = FlipUtil.getAccentColor(context);
         resourceCheck = DEFAULT_DRAWABLE;
         mScale = DEFAULT_SCALE;
         mDuration = DEFAULT_DURATION;
