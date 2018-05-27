@@ -1,1 +1,1 @@
-include ':app', ':flipimageview'
+include ':demo', ':flipimageview'
