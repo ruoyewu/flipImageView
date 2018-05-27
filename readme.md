@@ -20,7 +20,7 @@ allprojects {
 
 ```groovy
 dependencies {
-	        implementation 'com.github.ruoyewu:FlipImageView:1.0.0'
+	        implementation 'com.github.ruoyewu:flipimageview:1.0.0'
 }
 ```
 
@@ -40,7 +40,7 @@ dependencies {
 ```xml
 <dependency>
     <groupId>com.github.ruoyewu</groupId>
-    <artifactId>FlipImageView</artifactId>
+    <artifactId>flipimageview</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
