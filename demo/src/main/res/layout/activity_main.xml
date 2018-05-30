@@ -8,8 +8,8 @@
     <com.wuruoye.flipimageview.FlipImageView
         android:id="@+id/fiv"
         app:flipDirection="LR"
-        app:flipDuration="3000"
-        app:flipScale="0.5"
+        app:flipDuration="500"
+        app:flipScale="0.6"
         app:flipCheckDrawable="@drawable/ic_check"
         android:src="@drawable/ic_free_breakfast"
         android:layout_centerInParent="true"

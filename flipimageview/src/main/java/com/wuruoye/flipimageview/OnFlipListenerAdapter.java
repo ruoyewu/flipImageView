@@ -15,4 +15,14 @@ public abstract class OnFlipListenerAdapter implements OnFlipListener {
     public void onFlipEnd() {
 
     }
+
+    @Override
+    public void onSecondStart() {
+
+    }
+
+    @Override
+    public void onThirdStart() {
+
+    }
 }

@@ -226,9 +226,9 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
         return (int) (progress * MAX_ALPHA);
     }
 
-    private void beforeProgress(float lastProgress, float progress) {
+    private void beforeDraw(float lastProgress, float progress) {
         if (mOnFlipListener != null) {
-//            Log.e(TAG, "beforeProgress: " + lastProgress + " " + progress );
+//            Log.e(TAG, "beforeDraw: " + lastProgress + " " + progress );
             if (lastProgress < MIDDLE_1 && progress >= MIDDLE_1) {
                 mOnFlipListener.onSecondStart();
             }else if (lastProgress < MIDDLE_2 && progress >= MIDDLE_2) {
@@ -238,8 +238,11 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
             }else if (lastProgress > MIDDLE_1 && progress <= MIDDLE_1) {
                 mOnFlipListener.onThirdStart();
             }
-            mLastProgress = progress;
         }
+    }
+
+    private void afterDraw(float progress) {
+        mLastProgress = progress;
     }
 
     @Override
@@ -251,28 +254,38 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
         float progress = mProgress;
 
-        beforeProgress(mLastProgress, progress);
+        beforeDraw(mLastProgress, progress);
         canvas.save();
         int center = canvas.getWidth() / 2;
 
-        if (progress < 0.5) {
+        if (progress < MIDDLE_1) {
             // TODO: 2018/5/26 如果在 xml 文件中 imageSrc 和 flipCheckDrawable 使用同一个 resource，
-            // 会导致两者共享透明度，需要在此手动重新定义透明度
+            // TODO: 2018/5/26 会导致两者共享透明度，需要在此手动重新定义透明度
             mOriginDrawable.setAlpha(MAX_ALPHA);
 
             progress = firstProgress(progress);
             scaleCanvas(canvas, progress);
-            if (mOriginDrawable != null) {
-                mOriginDrawable.draw(canvas);
+
+            // TODO: 2018/5/30 因为要保持 ImageView 本身的关于图片显示的设置，所以要使用 ImageView 本身
+            // TODO: 2018/5/30 提供的方法完成图片的绘制
+            // 设置显示图片
+            if (mLastProgress > MIDDLE_1) {
+                setImageDrawable(mOriginDrawable);
             }
-        }else if (progress < 1) {
+//            if (mOriginDrawable != null) {
+//                mOriginDrawable.draw(canvas);
+//            }
+        }else if (progress < MIDDLE_2) {
             progress = secondProgress(progress);
             scaleCanvas(canvas, progress);
             canvas.drawOval(mAllRectF, mBgPaint);
+
+            // 取消显示图片
+            if (mLastProgress < MIDDLE_2) {
+                setImageDrawable(null);
+            }
         }else {
             progress = thirdProgress(progress);
             canvas.drawOval(mAllRectF, mBgPaint);
@@ -286,6 +299,9 @@ public class FlipImageView extends android.support.v7.widget.AppCompatImageView
         }
 
         canvas.restore();
+        afterDraw(progress);
+
+        super.onDraw(canvas);
     }
 
     @Override

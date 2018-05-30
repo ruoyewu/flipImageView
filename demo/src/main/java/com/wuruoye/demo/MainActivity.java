@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.wuruoye.flipimageview.FlipImageView;
-import com.wuruoye.flipimageview.OnFlipListener;
 
 /**
  * @Created : wuruoye
@@ -27,27 +26,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fiv = findViewById(R.id.fiv);
 
         fiv.setOnClickListener(this);
-        fiv.setOnFlipListener(new OnFlipListener() {
-            @Override
-            public void onFlipStart() {
-                log("onFlipStart");
-            }
-
-            @Override
-            public void onFlipEnd() {
-                log("onFlipEnd");
-            }
-
-            @Override
-            public void onSecondStart() {
-                log("onSecondStart");
-            }
-
-            @Override
-            public void onThirdStart() {
-                log("onThirdStart");
-            }
-        });
     }
 
     @Override
